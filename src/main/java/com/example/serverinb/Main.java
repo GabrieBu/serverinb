@@ -1,0 +1,29 @@
+package com.example.serverinb;
+
+import com.example.serverinb.Controller.MainController;
+import com.example.serverinb.Model.Server;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
+public class Main extends Application {
+    @Override
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main_view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 480, 225);
+        stage.setTitle("Server Log");
+        stage.setScene(scene);
+        stage.show();
+
+        Server server = new Server();
+        MainController contr = fxmlLoader.getController();
+        contr.initModel(server);
+    }
+
+    public static void main(String[] args) {
+        launch();
+    }
+}
