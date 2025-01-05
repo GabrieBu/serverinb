@@ -31,7 +31,7 @@ public class RunnableSend implements Runnable {
     }
 
     private static boolean checkEmailInFileNames(String email) {
-        File directory = new File("src/Storage/inboxes/");
+        File directory = new File("serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
         if (files == null) {
             return false;
@@ -48,7 +48,7 @@ public class RunnableSend implements Runnable {
 
 
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
-        String filePathName = "src/Storage/inboxes/" + emailAddress + ".txt";
+        String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + emailAddress + ".txt";
         try {
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
@@ -75,6 +75,7 @@ public class RunnableSend implements Runnable {
                         sendFile(jsonObjectReq, clientSocket);
                         clientSocket.close();
                         //logger.logSuccess("Mail sent to " + emailAddress + " correctly on port " + clientPort);
+                        System.out.println("Mail sent to " + emailAddress + " correctly on port " + clientPort);
                     }
                     updateFile(emailAddress, mail);
                 }
@@ -85,6 +86,7 @@ public class RunnableSend implements Runnable {
                         Socket clientSocket = new Socket("localhost", clientPortFrom);
                         sendError(clientSocket, emailAddress);
                         //logger.logError("Mail hasn't be sent. Address [" + emailAddress + "] does not exist");
+                        System.out.println("Mail hasn't be sent. Address [" + emailAddress + "] does not exist");
                         clientSocket.close();
                     }
                 }

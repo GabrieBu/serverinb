@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Listener implements Runnable {
+public class Listener implements Runnable{
     private ExecutorService executor;
     private Server server;
 
@@ -22,11 +22,10 @@ public class Listener implements Runnable {
     @Override
     public void run() {
         executor = Executors.newFixedThreadPool(server.getPoolSize());
-
         try {
-            ServerSocket serverSocket = new ServerSocket(server.getServerPort());
+            ServerSocket serverSocket = new ServerSocket(this.server.getServerPort());
             while(true) {
-                //logger.logMessage("Server listening on port " + SERVER_PORT);
+                System.out.println("Listening on port " + server.getServerPort());
                 Socket sock = serverSocket.accept();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 String clientReqString = reader.readLine();
@@ -64,10 +63,10 @@ public class Listener implements Runnable {
         }
         catch (Exception e) {
             //logger.logError("Server is not listening. Error occured: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             //non so che fare qui
         }
         finally {
-            //logger.logMessage("Server is going to be stopped!");
             executor.shutdown();
         }
     }

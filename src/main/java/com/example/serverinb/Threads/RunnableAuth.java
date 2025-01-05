@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 
 public class RunnableAuth implements Runnable{
     String clientReqString;
-    private Server server;
+    private final Server server;
 
     public RunnableAuth(String clientReqString, Server server) {
         this.clientReqString = clientReqString;
@@ -38,7 +38,7 @@ public class RunnableAuth implements Runnable{
             JsonObject response = new JsonObject();
             response.addProperty("type", "response_auth");
             if (checkEmailInFileNames(userMail)) {
-                String filePathName = "src/Storage/inboxes/" + userMail + ".txt";
+                String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + userMail + ".txt";
                 try {
                     String fileContent = Files.readString(Paths.get(filePathName));
                     JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
@@ -47,6 +47,7 @@ public class RunnableAuth implements Runnable{
                     response.addProperty("inbox", inbox.toString());
                     server.putPort(userMail, clientPort);  // storing the email-port mapping
                     //logger.logSuccess("User [" + userMail + "] " + "authenticated");
+                    System.out.println("User [\" + userMail + \"] \" + \"authenticated");
                 } catch (IOException e) {
                     throw new RuntimeException("Error reading inbox file: " + e.getMessage());
                 }
@@ -58,22 +59,28 @@ public class RunnableAuth implements Runnable{
         }
         catch( IOException e){
             //logger.logError("Can't open the client socket!" + e.getMessage());
+            System.out.println("Error reading inbox file: " + e.getMessage());
         }
     }
 
     private static boolean checkEmailInFileNames(String email) {
-        File directory = new File("src/Storage/inboxes/");
+        System.out.println("Working Directory: " + System.getProperty("user.dir"));
+        File directory = new File("serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
+
         if (files == null) {
+            System.out.println("No one Files found");
             return false;
         }
 
         for (File file : files) {
             String fileNameWithoutExtension = getFileNameWithoutExtension(file.getName());
             if (fileNameWithoutExtension.equals(email)) {
+                System.out.println("File found " + fileNameWithoutExtension);
                 return true;
             }
         }
+        System.out.println("Files not found");
         return false;
     }
 

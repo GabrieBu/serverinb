@@ -38,6 +38,7 @@ public class RunnableReply implements Runnable {
                     sendFile(jsonObjectReq, clientSocket);
                     clientSocket.close();
                     //logger.logSuccess(from + "replied to " + toRecipient + " correctly on port " + clientPort);
+                    System.out.println(from + "replied to " + toRecipient + " correctly on port " + clientPort);
                 }
                 updateFile(toRecipient, mail);
             } catch (IOException e) {
@@ -58,6 +59,7 @@ public class RunnableReply implements Runnable {
                         sendFile(jsonObjectReq, clientSocket);
                         clientSocket.close();
                         //logger.logSuccess(from + " replies to " + toRecipient + " correctly on port " + clientPort);
+                        System.out.println(from + "replied to " + toRecipient + " on port " + clientPort);
                     }
                     updateFile(toRecipient, mail);
                 }
@@ -79,7 +81,7 @@ public class RunnableReply implements Runnable {
     }
 
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
-        String filePathName = "src/Storage/inboxes/" + emailAddress + ".txt";
+        String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + emailAddress + ".txt";
         try {
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();

@@ -20,7 +20,7 @@ public class RunnableDelete implements Runnable{
         try {
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
             String mailUser = jsonObjectReq.get("user").getAsString();
-            String filePathName = "src/Storage/inboxes/" + mailUser + ".txt";
+            String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + mailUser + ".txt";
 
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectFile = JsonParser.parseString(fileContent).getAsJsonObject();
@@ -28,11 +28,8 @@ public class RunnableDelete implements Runnable{
             int indexToRemove = jsonObjectReq.get("index_to_remove").getAsInt();
             inbox.remove(indexToRemove);
             rewriteFile(inbox, filePathName);
-            /*
-            TO DELETE
-             */
             //logger.logSuccess("Email deleted from server correctly [" + mailUser + "]");
-            
+            System.out.println("Email deleted from server correctly [" + mailUser + "]");
         }
         catch (IOException e) {
             e.printStackTrace();

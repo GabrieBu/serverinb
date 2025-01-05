@@ -20,7 +20,7 @@ public class Main extends Application {
 
         Server server = new Server();
         MainController contr = fxmlLoader.getController();
-        contr.initModel(server);
+        contr.initListener(server);
     }
 
     public static void main(String[] args) {

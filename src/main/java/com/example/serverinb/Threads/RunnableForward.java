@@ -13,6 +13,6 @@ public class RunnableForward implements Runnable {
     }
 
     public void run() {
-        //logger.logMessage("Forward!");
+        System.out.println("Forward");
     }
 }

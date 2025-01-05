@@ -5,23 +5,21 @@ import com.example.serverinb.Threads.Listener;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainController {
     private Server server;
     @FXML
     private ListView<String> listViewLog;
 
-    public void initModel(Server server){
+    public void initListener(Server server){
         if(this.server == null)
             this.server = server;
-        startListener();
-    }
-
-    public void startListener() {
-        if (this.server == null) {
-            throw new IllegalStateException("Inbox must be initialized before starting the listener.");
-        }
+        ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
         Listener listener = new Listener(server);
-        Thread thread = new Thread(listener);
-        thread.start();
+        singleExecutor.execute(listener);
+
+        System.out.println("Listener Partito");
     }
 }
