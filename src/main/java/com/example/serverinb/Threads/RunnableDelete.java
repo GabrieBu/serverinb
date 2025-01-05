@@ -1,8 +1,10 @@
 package com.example.serverinb.Threads;
 
+import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,16 +13,18 @@ import java.nio.file.Paths;
 
 public class RunnableDelete implements Runnable{
     private final String clientReqString;
+    private final Server server;
 
-    public RunnableDelete(String cientReqString) {
+    public RunnableDelete(String cientReqString, Server server) {
         this.clientReqString = cientReqString;
+        this.server = server;
     }
 
     public void run() {
         try {
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
             String mailUser = jsonObjectReq.get("user").getAsString();
-            String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + mailUser + ".txt";
+            String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailUser + ".txt";
 
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectFile = JsonParser.parseString(fileContent).getAsJsonObject();
@@ -28,8 +32,9 @@ public class RunnableDelete implements Runnable{
             int indexToRemove = jsonObjectReq.get("index_to_remove").getAsInt();
             inbox.remove(indexToRemove);
             rewriteFile(inbox, filePathName);
-            //logger.logSuccess("Email deleted from server correctly [" + mailUser + "]");
-            System.out.println("Email deleted from server correctly [" + mailUser + "]");
+            Platform.runLater(() -> {
+                server.getLogMessages().add("Email deleted from server correctly [" + mailUser + "]");
+            });
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -42,7 +47,6 @@ public class RunnableDelete implements Runnable{
 
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(newContentFile.toString());
-            System.out.println("File successfully overwritten.");
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
         }

@@ -11,11 +11,11 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Listener implements Runnable{
+public class Dispatcher implements Runnable{
     private ExecutorService executor;
     private Server server;
 
-    public Listener(Server server) {
+    public Dispatcher(Server server) {
         this.server = server;
     }
 
@@ -40,7 +40,7 @@ public class Listener implements Runnable{
                         executor.execute(new RunnableSend(clientReqString, server));
                         break;
                     case "delete":
-                        executor.execute(new RunnableDelete(clientReqString));
+                        executor.execute(new RunnableDelete(clientReqString, server));
                         break;
                     case "reply":
                     case "reply_all":

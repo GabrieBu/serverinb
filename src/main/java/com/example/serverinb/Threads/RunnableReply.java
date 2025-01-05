@@ -4,6 +4,7 @@ import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,7 +39,8 @@ public class RunnableReply implements Runnable {
                     sendFile(jsonObjectReq, clientSocket);
                     clientSocket.close();
                     //logger.logSuccess(from + "replied to " + toRecipient + " correctly on port " + clientPort);
-                    System.out.println(from + "replied to " + toRecipient + " correctly on port " + clientPort);
+                    //System.out.println("[ " + from + "] replied to [" + toRecipient + "]");
+                    server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
                 }
                 updateFile(toRecipient, mail);
             } catch (IOException e) {
@@ -58,8 +60,9 @@ public class RunnableReply implements Runnable {
                         Socket clientSocket = new Socket("localhost", clientPort);
                         sendFile(jsonObjectReq, clientSocket);
                         clientSocket.close();
-                        //logger.logSuccess(from + " replies to " + toRecipient + " correctly on port " + clientPort);
-                        System.out.println(from + "replied to " + toRecipient + " on port " + clientPort);
+                        Platform.runLater(() -> {
+                            server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
+                        });
                     }
                     updateFile(toRecipient, mail);
                 }

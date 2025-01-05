@@ -4,9 +4,9 @@
 <?import javafx.scene.layout.*?>
 
 <StackPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.serverinb.Controller.MainController">
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="432.0" prefWidth="768.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView prefHeight="200.0" prefWidth="200.0" />
+      <ListView fx:id="listViewLog" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
 </StackPane>

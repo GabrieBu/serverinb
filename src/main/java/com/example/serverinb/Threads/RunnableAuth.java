@@ -4,6 +4,7 @@ import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +47,9 @@ public class RunnableAuth implements Runnable{
                     JsonArray inbox = jsonObject.getAsJsonArray("inbox");
                     response.addProperty("inbox", inbox.toString());
                     server.putPort(userMail, clientPort);  // storing the email-port mapping
-                    //logger.logSuccess("User [" + userMail + "] " + "authenticated");
-                    System.out.println("User [\" + userMail + \"] \" + \"authenticated");
+                    Platform.runLater(() -> {
+                        server.getLogMessages().add("User [" + userMail + "] " + "authenticated");
+                    });
                 } catch (IOException e) {
                     throw new RuntimeException("Error reading inbox file: " + e.getMessage());
                 }
@@ -58,13 +60,11 @@ public class RunnableAuth implements Runnable{
             clientSocket.close(); //forse va messo in un finally
         }
         catch( IOException e){
-            //logger.logError("Can't open the client socket!" + e.getMessage());
             System.out.println("Error reading inbox file: " + e.getMessage());
         }
     }
 
     private static boolean checkEmailInFileNames(String email) {
-        System.out.println("Working Directory: " + System.getProperty("user.dir"));
         File directory = new File("serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
 

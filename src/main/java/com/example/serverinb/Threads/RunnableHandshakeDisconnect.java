@@ -3,6 +3,7 @@ package com.example.serverinb.Threads;
 import com.example.serverinb.Model.Server;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
 
 public class RunnableHandshakeDisconnect implements Runnable{
     private final String clientReqString;
@@ -30,13 +31,15 @@ public class RunnableHandshakeDisconnect implements Runnable{
         int clientPort = unpackPort(this.clientReqString);
 
         if(this.typeReqString.equals("handshake")) {
-            //logger.logMessage("[" + typedMail + "] connected correctly on port " + clientPort);
-            System.out.println("[" + typedMail + "] connected correctly on port " + clientPort);
+            Platform.runLater(() -> {
+                server.getLogMessages().add("[" + typedMail + "] reserved port " + clientPort);
+            });
             this.server.putPort(typedMail, clientPort);
         }
         else if(this.typeReqString.equals("disconnect")) {
-            //logger.logMessage("[" + typedMail + "] disconnected");
-            System.out.println("[" + typedMail + "] disconnected");
+            Platform.runLater(() -> {
+                server.getLogMessages().add("[" + typedMail + "] disconnected, releasing port " + clientPort);
+            });
             this.server.deletePort(typedMail);
         }
     }

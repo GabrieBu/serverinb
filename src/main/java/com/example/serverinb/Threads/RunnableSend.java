@@ -4,6 +4,7 @@ import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,6 @@ public class RunnableSend implements Runnable {
         return false;
     }
 
-
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
         String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + emailAddress + ".txt";
         try {
@@ -65,7 +65,7 @@ public class RunnableSend implements Runnable {
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
             JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
             JsonArray allMails = mail.getAsJsonArray("to");
-
+            String from = mail.get("from").getAsString();
             for (int i = 0; i < allMails.size(); i++) {
                 String emailAddress = allMails.get(i).getAsString();
                 if(checkEmailInFileNames(emailAddress)) {
@@ -74,19 +74,20 @@ public class RunnableSend implements Runnable {
                         Socket clientSocket = new Socket("localhost", clientPort);
                         sendFile(jsonObjectReq, clientSocket);
                         clientSocket.close();
-                        //logger.logSuccess("Mail sent to " + emailAddress + " correctly on port " + clientPort);
-                        System.out.println("Mail sent to " + emailAddress + " correctly on port " + clientPort);
+                        Platform.runLater(() -> {
+                            server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
+                        });
                     }
                     updateFile(emailAddress, mail);
                 }
                 else{
-                    String from = mail.get("from").getAsString();
                     if(this.server.hasKey(from)) {
                         int clientPortFrom = server.getPort(from);
                         Socket clientSocket = new Socket("localhost", clientPortFrom);
                         sendError(clientSocket, emailAddress);
-                        //logger.logError("Mail hasn't be sent. Address [" + emailAddress + "] does not exist");
-                        System.out.println("Mail hasn't be sent. Address [" + emailAddress + "] does not exist");
+                        Platform.runLater(() -> {
+                            server.getLogMessages().add("Mail from [ " + from + "] hasn't be sent. Address [" + emailAddress + "] does not exist");
+                        });
                         clientSocket.close();
                     }
                 }

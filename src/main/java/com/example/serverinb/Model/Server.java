@@ -1,5 +1,8 @@
 package com.example.serverinb.Model;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,9 +10,15 @@ public class Server{
     private static Map<String, Integer> clientsInfo;
     private final int POOL_SIZE = 16;
     private final int SERVER_PORT = 8189;
+    private final ObservableList<String> logMessages;
 
     public Server(){
         clientsInfo = new HashMap<>();
+        this.logMessages = FXCollections.observableArrayList();
+    }
+
+    public ObservableList<String> getLogMessages(){
+        return logMessages;
     }
 
     public HashMap<String, Integer> getClientsInfo(){
