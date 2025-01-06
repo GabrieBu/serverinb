@@ -1,1 +1,1 @@
-{"inbox":[]}
+{"inbox":[{"from":"b@c.com","to":["a@b.com"],"subject":"Fw: Prova finale provissima","body":"From: a@b.com\n\n\nNon lo so","date":"2025-01-06T14:43:07.672721"},{"from":"b@c.com","to":["a@b.com"],"subject":"Fw: Proviamo La forward insieme","body":"From: c@d.com\n\n\nThis is a text message!","date":"2025-01-06T14:44:18.202009"}]}

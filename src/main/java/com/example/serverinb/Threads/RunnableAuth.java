@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class RunnableAuth implements Runnable{
-    String clientReqString;
+    private final String clientReqString;
     private final Server server;
 
     public RunnableAuth(String clientReqString, Server server) {
@@ -39,7 +39,7 @@ public class RunnableAuth implements Runnable{
             JsonObject response = new JsonObject();
             response.addProperty("type", "response_auth");
             if (checkEmailInFileNames(userMail)) {
-                String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + userMail + ".txt";
+                String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + userMail + ".txt";
                 try {
                     String fileContent = Files.readString(Paths.get(filePathName));
                     JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
@@ -65,7 +65,7 @@ public class RunnableAuth implements Runnable{
     }
 
     private static boolean checkEmailInFileNames(String email) {
-        File directory = new File("serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
+        File directory = new File("/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
 
         if (files == null) {

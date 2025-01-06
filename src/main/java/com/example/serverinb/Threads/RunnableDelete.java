@@ -24,7 +24,7 @@ public class RunnableDelete implements Runnable{
         try {
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
             String mailUser = jsonObjectReq.get("user").getAsString();
-            String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailUser + ".txt";
+            String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailUser + ".txt";
 
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectFile = JsonParser.parseString(fileContent).getAsJsonObject();

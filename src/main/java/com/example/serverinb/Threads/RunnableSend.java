@@ -32,7 +32,7 @@ public class RunnableSend implements Runnable {
     }
 
     private static boolean checkEmailInFileNames(String email) {
-        File directory = new File("serverinb/src/main/java/com/example/serverinb/Storage/inboxes");
+        File directory = new File("/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
         if (files == null) {
             return false;
@@ -48,7 +48,7 @@ public class RunnableSend implements Runnable {
     }
 
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
-        String filePathName = "serverinb/src/main/java/com/example/serverinb/Storage/inboxes" + emailAddress + ".txt";
+        String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";
         try {
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
