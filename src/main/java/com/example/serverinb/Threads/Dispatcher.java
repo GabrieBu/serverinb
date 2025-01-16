@@ -12,8 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Dispatcher implements Runnable{
-    private ExecutorService executor;
-    private Server server;
+    private final Server server;
 
     public Dispatcher(Server server) {
         this.server = server;
@@ -21,7 +20,7 @@ public class Dispatcher implements Runnable{
 
     @Override
     public void run() {
-        executor = Executors.newFixedThreadPool(server.getPoolSize());
+        ExecutorService executor = Executors.newFixedThreadPool(server.getPoolSize());
         try {
             ServerSocket serverSocket = new ServerSocket(this.server.getServerPort());
             while(true) {
@@ -36,6 +35,7 @@ public class Dispatcher implements Runnable{
                     case "authentication":
                         executor.execute(new RunnableAuth(clientReqString, server));
                         break;
+                    case "forward":
                     case "send":
                         executor.execute(new RunnableSend(clientReqString, server));
                         break;
@@ -46,15 +46,11 @@ public class Dispatcher implements Runnable{
                     case "reply_all":
                         executor.execute(new RunnableReply(clientReqString, server, typeRequestString));
                         break;
-                    case "forward":
-                        executor.execute(new RunnableForward(clientReqString, server));
-                    case "handshake":
-                        executor.execute(new RunnableHandshakeDisconnect(clientReqString, server, typeRequestString));
-                        break;
                     case "disconnect":
-                        executor.execute(new RunnableHandshakeDisconnect(clientReqString, server, typeRequestString));
-                    case "ping":
-                        //ignore ping
+                        executor.execute(new RunnableDisconnect(clientReqString, server));
+                        break;
+                    case "request":
+                        executor.execute(new RunnableRequest(clientReqString));
                         break;
                     default:
                         System.out.println("Unknown command: " + typeRequestString);
@@ -62,7 +58,6 @@ public class Dispatcher implements Runnable{
             }
         }
         catch (Exception e) {
-            //logger.logError("Server is not listening. Error occured: " + e.getMessage());
             System.out.println("Error: " + e.getMessage());
             //non so che fare qui
         }

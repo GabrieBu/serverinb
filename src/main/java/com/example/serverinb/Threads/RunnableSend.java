@@ -18,6 +18,7 @@ public class RunnableSend implements Runnable {
     private final Server server;
     private final String clientReqString;
 
+
     public RunnableSend(String clientReqString, Server server) {
         this.server = server;
         this.clientReqString=clientReqString;
@@ -61,39 +62,25 @@ public class RunnableSend implements Runnable {
     }
 
     public void run() {
-        try {
-            JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
-            JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
-            JsonArray allMails = mail.getAsJsonArray("to");
-            String from = mail.get("from").getAsString();
-            for (int i = 0; i < allMails.size(); i++) {
-                String emailAddress = allMails.get(i).getAsString();
-                if(checkEmailInFileNames(emailAddress)) {
-                    if(this.server.hasKey(emailAddress)) {
-                        int clientPort = server.getPort(emailAddress);
-                        Socket clientSocket = new Socket("localhost", clientPort);
-                        sendFile(jsonObjectReq, clientSocket);
-                        clientSocket.close();
-                        Platform.runLater(() -> {
-                            server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
-                        });
-                    }
-                    updateFile(emailAddress, mail);
-                }
-                else{
-                    if(this.server.hasKey(from)) {
-                        int clientPortFrom = server.getPort(from);
-                        Socket clientSocket = new Socket("localhost", clientPortFrom);
-                        sendError(clientSocket, emailAddress);
-                        Platform.runLater(() -> {
-                            server.getLogMessages().add("Mail from [ " + from + "] hasn't be sent. Address [" + emailAddress + "] does not exist");
-                        });
-                        clientSocket.close();
-                    }
-                }
+        JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
+        JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
+        JsonArray allMails = mail.getAsJsonArray("to");
+        String from = mail.get("from").getAsString();
+
+        for (int i = 0; i < allMails.size(); i++) {
+            String emailAddress = allMails.get(i).getAsString();
+            if (checkEmailInFileNames(emailAddress)) {
+                Platform.runLater(() -> {
+                    server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
+                });
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            //updateFile(emailAddress, mail);
+            else{
+                //sendError
+                Platform.runLater(() -> {
+                    server.getLogMessages().add("Mail from [ " + from + "] hasn't be sent. Address [ to edit + ] does not exist");
+                });
+            }
         }
     }
 
@@ -105,17 +92,6 @@ public class RunnableSend implements Runnable {
             OutputStream outputStream = socket.getOutputStream();
             PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
             writer.println(jsonObjectError);
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendFile(JsonObject emailToBeSent, Socket socket) {
-        try {
-            OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
-            writer.println(emailToBeSent.toString());
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,9 +7,6 @@ import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -32,56 +29,27 @@ public class RunnableReply implements Runnable {
             JsonArray allMails = mail.getAsJsonArray("to");
             String toRecipient = allMails.get(0).getAsString();
 
-            try {
-                if(this.server.hasKey(toRecipient)) {
-                    int clientPort = server.getPort(toRecipient);
-                    Socket clientSocket = new Socket("localhost", clientPort);
-                    sendFile(jsonObjectReq, clientSocket);
-                    clientSocket.close();
-                    Platform.runLater(() -> {
-                        server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
-                    });
-                }
-                updateFile(toRecipient, mail);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Platform.runLater(() -> {
+                server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
+            });
         }
+        //updateFile(toRecipient, mail);
         else{ //reply_all
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
             JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
             String from = mail.get("from").getAsString();
             JsonArray allMails = mail.getAsJsonArray("to");
-            try {
-                for (int i = 0; i < allMails.size(); i++) {
-                    String toRecipient = allMails.get(i).getAsString();
-                    if(this.server.hasKey(toRecipient)) {
-                        int clientPort = server.getPort(toRecipient);
-                        Socket clientSocket = new Socket("localhost", clientPort);
-                        sendFile(jsonObjectReq, clientSocket);
-                        clientSocket.close();
-                        Platform.runLater(() -> {
-                            server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
-                        });
-                    }
-                    updateFile(toRecipient, mail);
-                }
-            }catch (IOException e){
-                e.printStackTrace();
+            for (int i = 0; i < allMails.size(); i++) {
+                String toRecipient = allMails.get(i).getAsString();
+                    Platform.runLater(() -> {
+                        server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
+                    });
             }
+                //updateFile(toRecipient, mail);
         }
     }
 
-    private void sendFile(JsonObject emailToBeSent, Socket socket) {
-        try {
-            OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
-            writer.println(emailToBeSent.toString());
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
         String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";

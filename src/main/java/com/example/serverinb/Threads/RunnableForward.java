@@ -88,39 +88,23 @@ public class RunnableForward implements Runnable {
     }
 
     public void run() {
-        try {
-            JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
-            JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
-            JsonArray allMails = mail.getAsJsonArray("to");
-            String from = mail.get("from").getAsString();
-            for (int i = 0; i < allMails.size(); i++) {
-                String emailAddress = allMails.get(i).getAsString();
-                if(checkEmailInFileNames(emailAddress)) {
-                    if(this.server.hasKey(emailAddress)) {
-                        int clientPort = server.getPort(emailAddress);
-                        Socket clientSocket = new Socket("localhost", clientPort);
-                        sendFile(jsonObjectReq, clientSocket);
-                        clientSocket.close();
-                        Platform.runLater(() -> {
-                            server.getLogMessages().add("Mail from [ " + from + "] forwarded to " + emailAddress);
-                        });
-                    }
-                    updateFile(emailAddress, mail);
-                }
-                else{
-                    if(this.server.hasKey(from)) {
-                        int clientPortFrom = server.getPort(from);
-                        Socket clientSocket = new Socket("localhost", clientPortFrom);
-                        sendError(clientSocket, emailAddress);
-                        Platform.runLater(() -> {
-                            server.getLogMessages().add("Mail from [ " + from + "] hasn't be forwarded. Address [" + emailAddress + "] does not exist");
-                        });
-                        clientSocket.close();
-                    }
-                }
+        JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
+        JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
+        JsonArray allMails = mail.getAsJsonArray("to");
+        String from = mail.get("from").getAsString();
+        for (int i = 0; i < allMails.size(); i++) {
+            String emailAddress = allMails.get(i).getAsString();
+            if(checkEmailInFileNames(emailAddress)) {
+                Platform.runLater(() -> {
+                    server.getLogMessages().add("Mail from [ " + from + "] forwarded to " + emailAddress);
+                });
+                updateFile(emailAddress, mail);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            else{
+                Platform.runLater(() -> {
+                    server.getLogMessages().add("Mail from [ " + from + "] hasn't be forwarded. Address [" + emailAddress + "] does not exist");
+                });
+            }
         }
     }
 }

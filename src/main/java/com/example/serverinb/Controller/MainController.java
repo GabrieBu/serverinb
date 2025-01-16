@@ -34,7 +34,7 @@ public class MainController {
     }
 
     private void initListView() {
-        listViewLog.setItems(server.getLogMessages()); //bind the view to to the list in the model
+        listViewLog.setItems(server.getLogMessages()); //bind the view to the list in the model
 
         listViewLog.setCellFactory(param -> new ListCell<>() {
             protected void updateItem(String message, boolean empty) {

@@ -44,6 +44,7 @@ public class RunnableDelete implements Runnable{
     private void rewriteFile(JsonArray inbox, String filePath) {
         JsonObject newContentFile = new JsonObject();
         newContentFile.add("inbox", inbox);
+        newContentFile.addProperty("last_id_sent", inbox.isEmpty() ? Long.MIN_VALUE : inbox.get(inbox.size() - 1).getAsJsonObject().get("id").getAsInt());
 
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(newContentFile.toString());

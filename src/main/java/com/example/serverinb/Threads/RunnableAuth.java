@@ -33,31 +33,22 @@ public class RunnableAuth implements Runnable{
     }
 
     private void sendData(int clientPort, String userMail) {
+        //forse va messo in un finally
         try {
             Socket clientSocket = new Socket("localhost", clientPort);
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
             JsonObject response = new JsonObject();
             response.addProperty("type", "response_auth");
             if (checkEmailInFileNames(userMail)) {
-                String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + userMail + ".txt";
-                try {
-                    String fileContent = Files.readString(Paths.get(filePathName));
-                    JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
-                    response.addProperty("authenticated", true);
-                    JsonArray inbox = jsonObject.getAsJsonArray("inbox");
-                    response.addProperty("inbox", inbox.toString());
-                    server.putPort(userMail, clientPort);  // storing the email-port mapping
-                    Platform.runLater(() -> {
-                        server.getLogMessages().add("User [" + userMail + "] " + "authenticated");
-                    });
-                } catch (IOException e) {
-                    throw new RuntimeException("Error reading inbox file: " + e.getMessage());
-                }
+                response.addProperty("authenticated", true);
+                Platform.runLater(() -> {
+                    server.getLogMessages().add("User [" + userMail + "] " + "authenticated");
+                });
             } else {
                 response.addProperty("authenticated", false);
             }
             writer.println(response);
-            clientSocket.close(); //forse va messo in un finally
+            clientSocket.close();
         }
         catch( IOException e){
             System.out.println("Error reading inbox file: " + e.getMessage());
