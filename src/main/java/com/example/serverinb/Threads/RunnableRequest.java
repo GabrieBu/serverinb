@@ -1,8 +1,6 @@
 package com.example.serverinb.Threads;
 
-import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -28,11 +26,12 @@ public class RunnableRequest implements Runnable {
    public void run(){
         try (Socket socket = new Socket("localhost", unpack())){
             JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
+            System.out.println(jsonObjectReq);
             String mailAddress = jsonObjectReq.get("user").getAsString();
+            long lastIdSent = jsonObjectReq.get("last_id_received").getAsLong();
            OutputStream outputStream = socket.getOutputStream();
            PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
-
-           writer.println(generateResponse(mailAddress));
+           writer.println(generateResponse(mailAddress, lastIdSent));
            writer.flush();
        }
        catch (IOException e){
@@ -41,32 +40,24 @@ public class RunnableRequest implements Runnable {
        }
    }
 
-    private JsonObject generateResponse(String mailAddress) {
-        //apro file
+    private JsonObject generateResponse(String mailAddress, long lastIdSent) {
         JsonObject response = new JsonObject();
         String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailAddress + ".txt";
         try {
             String fileUser = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectUser = JsonParser.parseString(fileUser).getAsJsonObject();
 
-            long lastIdSent = jsonObjectUser.get("last_id_sent").getAsInt();
             JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox");
-
             JsonArray newEmails = new JsonArray();
-            long newLastId = lastIdSent;
 
             for (int i = inboxArray.size() - 1; i >= 0; i--) {
                 JsonObject mail = inboxArray.get(i).getAsJsonObject();
-                long mailId = mail.get("id").getAsInt();
+                long mailId = mail.get("id").getAsLong();
 
                 if (mailId > lastIdSent) {
                     newEmails.add(mail);
-                    newLastId = Math.max(newLastId, mailId);
                 }
             }
-
-            jsonObjectUser.addProperty("last_id_sent", newLastId);
-            Files.writeString(Paths.get(filePathName), jsonObjectUser.toString());
             response.add("inbox", newEmails);
         }
         catch (IOException e){

@@ -1,1 +1,1 @@
-{"inbox":[{"id":1,"from":"a@b.com","to":["c@d.com"],"subject":"aaa","body":"aaa","date":"2025-01-14T19:18:08.139370"},{"id":2,"from":"a@b.com","to":["c@d.com"],"subject":"aa","body":"aaaa","date":"2025-01-14T19:18:45.547696"},{"id":3,"from":"a@b.com","to":["c@d.com"],"subject":"aaa","body":"aaaaa","date":"2025-01-14T19:19:16.516342"}], "last_id_sent": -10000}
+{"inbox":[{"from":"a@b.com","to":["b@c.com","c@d.com"],"subject":"Re: proviamo a rispondere a tutti","body":"oamdnwadjkland\n\nrisposta a tutti!\n ","date":"2025-01-17T13:19:44.399087","id":-9223372036854775807}]}

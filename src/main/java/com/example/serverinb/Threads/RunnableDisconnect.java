@@ -24,10 +24,6 @@ public class RunnableDisconnect implements Runnable{
         return jsonObject.get("user").getAsString();
     }
 
-    /*
-    @TODO aggiornate last_id_sent a il minimo di un LONG
-     */
-
     public void updateFile(String emailAddress){
         String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";
         try {

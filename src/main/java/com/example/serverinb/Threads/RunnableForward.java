@@ -2,6 +2,7 @@ package com.example.serverinb.Threads;
 
 import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
@@ -49,12 +50,22 @@ public class RunnableForward implements Runnable {
         return false;
     }
 
+    private long getNextPossibleId(JsonArray inbox) {
+        if(!inbox.isEmpty()) {
+            JsonElement lastElementInbox = inbox.get(inbox.size() - 1);
+            JsonObject lastObject = lastElementInbox.getAsJsonObject();
+            return lastObject.get("id").getAsLong() + 1;
+        }
+        return Long.MIN_VALUE + 1;
+    }
+
     public void updateFile(String emailAddress, JsonObject emailToBeSent){
         String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";
         try {
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
             JsonArray inbox = jsonObject.getAsJsonArray("inbox");
+            emailToBeSent.addProperty("id", getNextPossibleId(inbox));
             inbox.add(emailToBeSent); //dovrei inserire in prima posizione in tempo ragionevole
             Files.writeString(Paths.get(filePathName), jsonObject.toString());
         } catch (IOException e) {
@@ -95,10 +106,10 @@ public class RunnableForward implements Runnable {
         for (int i = 0; i < allMails.size(); i++) {
             String emailAddress = allMails.get(i).getAsString();
             if(checkEmailInFileNames(emailAddress)) {
+                updateFile(emailAddress, mail);
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] forwarded to " + emailAddress);
                 });
-                updateFile(emailAddress, mail);
             }
             else{
                 Platform.runLater(() -> {

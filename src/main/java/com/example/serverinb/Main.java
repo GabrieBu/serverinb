@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main extends Application {
@@ -18,7 +19,14 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        Server server = new Server();
+        Server server;
+        try {
+            server = new Server();
+        }
+        catch (FileNotFoundException e) {
+            return;
+        }
+
         MainController contr = fxmlLoader.getController();
         contr.initListener(server);
     }

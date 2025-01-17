@@ -3,23 +3,50 @@ package com.example.serverinb.Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Server{
-    private final int POOL_SIZE = 16;
-    private final int SERVER_PORT = 8189;
-    private long currentIdMail;
+    private int POOL_SIZE;
+    private int SERVER_PORT;
     private final ObservableList<String> logMessages;
 
-    public Server(){
+    public Server() throws FileNotFoundException {
         this.logMessages = FXCollections.observableArrayList();
-        currentIdMail = Long.MIN_VALUE + 1;
+
+        setConfig();
     }
 
-    public long getCurrentIdMail() {
-        return currentIdMail;
-    }
+    private void setConfig() throws FileNotFoundException {
+        File configFile = new File("/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/config.txt");
+        try (Scanner scanner = new Scanner(configFile)) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine().trim();
+                if (line.isEmpty()) continue;
 
-    public void incrementCurrentIdMail(long currentIdMail) {
-        this.currentIdMail++;
+                String[] parts = line.split("=");
+                if (parts.length == 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+
+                    try {
+                        switch (key) {
+                            case "POOL_SIZE":
+                                this.POOL_SIZE = Integer.parseInt(value);
+                                break;
+                            case "PORT":
+                                this.SERVER_PORT = Integer.parseInt(value);
+                                break;
+                            default:
+                                System.out.println("Unrecognized key: " + key);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error loading config file " + key + ": " + value);
+                    }
+                }
+            }
+        }
     }
 
     public ObservableList<String> getLogMessages(){

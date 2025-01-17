@@ -2,14 +2,13 @@ package com.example.serverinb.Threads;
 
 import com.example.serverinb.Model.Server;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,7 +16,6 @@ import java.nio.file.Paths;
 public class RunnableSend implements Runnable {
     private final Server server;
     private final String clientReqString;
-
 
     public RunnableSend(String clientReqString, Server server) {
         this.server = server;
@@ -54,29 +52,41 @@ public class RunnableSend implements Runnable {
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
             JsonArray inbox = jsonObject.getAsJsonArray("inbox");
-            inbox.add(emailToBeSent); //dovrei inserire in prima posizione in tempo ragionevole
+            emailToBeSent.addProperty("id", getNextPossibleId(inbox));
+            inbox.add(emailToBeSent);
             Files.writeString(Paths.get(filePathName), jsonObject.toString());
+            System.out.println("Written :" + jsonObject);
         } catch (IOException e) {
             throw new RuntimeException("Error reading inbox file: " + e.getMessage());
         }
     }
 
+    private long getNextPossibleId(JsonArray inbox) {
+        if(!inbox.isEmpty()) {
+            JsonElement lastElementInbox = inbox.get(inbox.size() - 1);
+            JsonObject lastObject = lastElementInbox.getAsJsonObject();
+            return lastObject.get("id").getAsLong() + 1;
+        }
+        return Long.MIN_VALUE + 1; //min index possible, Long.MIN_VALUE reserved for clients connecting
+    }
+
     public void run() {
         JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
         JsonObject mail = jsonObjectReq.get("mail").getAsJsonObject();
-        JsonArray allMails = mail.getAsJsonArray("to");
+        JsonArray mailAddresses = mail.getAsJsonArray("to");
         String from = mail.get("from").getAsString();
+        int clientPort = jsonObjectReq.get("port").getAsInt();
 
-        for (int i = 0; i < allMails.size(); i++) {
-            String emailAddress = allMails.get(i).getAsString();
+        for (int i = 0; i < mailAddresses.size(); i++) {
+            String emailAddress = mailAddresses.get(i).getAsString();
             if (checkEmailInFileNames(emailAddress)) {
+                updateFile(emailAddress, mail);
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
                 });
             }
-            //updateFile(emailAddress, mail);
             else{
-                //sendError
+                sendError(clientPort, mailAddresses);
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] hasn't be sent. Address [ to edit + ] does not exist");
                 });
@@ -84,15 +94,19 @@ public class RunnableSend implements Runnable {
         }
     }
 
-    private void sendError(Socket socket, String to){
+    private void sendError(int clientPort, JsonArray recipients) {
         JsonObject jsonObjectError = new JsonObject();
         jsonObjectError.addProperty("type", "send_error");
-        jsonObjectError.addProperty("to", to);
-        try{
-            OutputStream outputStream = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
-            writer.println(jsonObjectError);
-            writer.flush();
+        StringBuilder listErrorRecipints = new StringBuilder();
+
+        for(JsonElement errorRecipient : recipients){
+            if(!checkEmailInFileNames(errorRecipient.getAsString())){
+                listErrorRecipints.append(errorRecipient.getAsString());
+            }
+        }
+        jsonObjectError.addProperty("to", listErrorRecipints.toString());
+        try(Socket toClient = new Socket("localhost", clientPort)) {
+            toClient.getOutputStream().write(jsonObjectError.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
