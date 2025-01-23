@@ -18,15 +18,9 @@ public class RunnableRequest implements Runnable {
         this.clientReqString=clientReqString;
     }
 
-    public int unpack() {
-        JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
-        return jsonObjectReq.get("port").getAsInt();
-    }
-
    public void run(){
-        try (Socket socket = new Socket("localhost", unpack())){
-            JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
-            System.out.println(jsonObjectReq);
+       JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
+        try (Socket socket = new Socket("localhost", jsonObjectReq.get("port").getAsInt())){
             String mailAddress = jsonObjectReq.get("user").getAsString();
             long lastIdSent = jsonObjectReq.get("last_id_received").getAsLong();
            OutputStream outputStream = socket.getOutputStream();

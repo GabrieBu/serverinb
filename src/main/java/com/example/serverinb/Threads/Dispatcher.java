@@ -37,6 +37,7 @@ public class Dispatcher implements Runnable{
                         break;
                     case "forward":
                     case "send":
+                        System.out.println("Send Arrived: " + clientReqString);
                         executor.execute(new RunnableSend(clientReqString, server));
                         break;
                     case "delete":
@@ -58,8 +59,7 @@ public class Dispatcher implements Runnable{
             }
         }
         catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            //non so che fare qui
+            System.out.println("Error: " + e.getMessage()); //handle better
         }
         finally {
             executor.shutdown();

@@ -19,7 +19,6 @@ public class MainController {
             this.server = server;
 
         initListView();
-
         try{
             ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
             Dispatcher dispatcher = new Dispatcher(server); //start the dispatcher
@@ -27,9 +26,6 @@ public class MainController {
         }
         catch (Exception e){
             System.out.println(e.getMessage());
-        }
-        finally {
-            //singleExecutor.shutdown();
         }
     }
 
@@ -43,7 +39,6 @@ public class MainController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // Create a Label for each log message
                     Label label = new Label(message);
                     label.setStyle("-fx-padding: 5; -fx-font-size: 14;"); // Optional: Add styling
                     setGraphic(label); // Set the Label as the graphic of the cell
