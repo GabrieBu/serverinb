@@ -9,18 +9,21 @@ import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableReply implements Runnable {
     private final String clientReqString;
     private final Server server;
     private final String typeReqString;
     private final FileManager fileManager;
+    ReadWriteLock rwl;
 
-    public RunnableReply(String clientReqString, Server server, String typeReqString) {
+    public RunnableReply(String clientReqString, Server server, String typeReqString,ReadWriteLock rwl) {
         this.clientReqString = clientReqString;
         this.server = server;
         this.typeReqString = typeReqString;
         fileManager = new FileManager();
+        this.rwl = rwl;
     }
 
     public void run() {
@@ -32,7 +35,7 @@ public class RunnableReply implements Runnable {
 
         if(typeReqString.equals("reply")) {
             String toRecipient = allMails.get(0).getAsString();
-            fileManager.updateFile(toRecipient, mail);
+            fileManager.updateFile(toRecipient, mail,rwl);
             Platform.runLater(() -> {
                 server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
             });
@@ -40,7 +43,7 @@ public class RunnableReply implements Runnable {
         else{ //reply_all
             for (int i = 0; i < allMails.size(); i++) {
                 String toRecipient = allMails.get(i).getAsString();
-                fileManager.updateFile(toRecipient, mail);
+                fileManager.updateFile(toRecipient, mail,rwl);
                 Platform.runLater(() -> {
                         server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
                 });

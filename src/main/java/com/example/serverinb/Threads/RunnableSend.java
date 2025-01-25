@@ -9,16 +9,19 @@ import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableSend implements Runnable {
     private final Server server;
     private final String clientReqString;
     private final FileManager fileManager;
+    ReadWriteLock rwl;
 
-    public RunnableSend(String clientReqString, Server server) {
+    public RunnableSend(String clientReqString, Server server,ReadWriteLock rwl) {
         this.server = server;
         this.clientReqString=clientReqString;
         this.fileManager = new FileManager();
+        this.rwl = rwl;
     }
 
     public void run() {
@@ -32,7 +35,7 @@ public class RunnableSend implements Runnable {
         for (int i = 0; i < recipients.size(); i++) {
             String emailAddress = recipients.get(i).getAsString();
             if (fileManager.checkEmailInFileNames(emailAddress)) {
-                fileManager.updateFile(emailAddress, mail); //it will be sent to correct addresses
+                fileManager.updateFile(emailAddress, mail,rwl); //it will be sent to correct addresses
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
                 });

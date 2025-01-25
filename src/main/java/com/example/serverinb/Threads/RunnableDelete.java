@@ -7,16 +7,19 @@ import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableDelete implements Runnable{
     private final String clientReqString;
     private final Server server;
     private final FileManager fileManager;
+    ReadWriteLock rwl;
 
-    public RunnableDelete(String cientReqString, Server server) {
+    public RunnableDelete(String cientReqString, Server server,ReadWriteLock rwl) {
         this.clientReqString = cientReqString;
         this.server = server;
         fileManager = new FileManager();
+        this.rwl = rwl;
     }
 
     public void run() {
@@ -24,7 +27,7 @@ public class RunnableDelete implements Runnable{
         String mailUser = jsonObjectReq.get("user").getAsString();
         int indexToRemove = jsonObjectReq.get("index_to_remove").getAsInt();
         try {
-            fileManager.rewriteFile(mailUser, indexToRemove);
+            fileManager.rewriteFile(mailUser, indexToRemove,rwl);
         } catch (IOException e) {
             throw new RuntimeException(e); //handle better
         }

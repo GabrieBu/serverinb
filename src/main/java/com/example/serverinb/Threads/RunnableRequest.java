@@ -10,17 +10,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableRequest implements Runnable {
     private final String clientReqString;
+    ReadWriteLock rwl;
 
-    public RunnableRequest(String clientReqString) {
+
+    public RunnableRequest(String clientReqString, ReadWriteLock rwl) {
         this.clientReqString=clientReqString;
+        this.rwl=rwl;
+
     }
 
    public void run(){
        JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
         try (Socket socket = new Socket("localhost", jsonObjectReq.get("port").getAsInt())){
+
             String mailAddress = jsonObjectReq.get("user").getAsString();
             long lastIdSent = jsonObjectReq.get("last_id_received").getAsLong();
            OutputStream outputStream = socket.getOutputStream();
@@ -35,12 +42,13 @@ public class RunnableRequest implements Runnable {
    }
 
     private JsonObject generateResponse(String mailAddress, long lastIdSent) {
+       /* Lock rl=rwl.readLock();*/
         JsonObject response = new JsonObject();
-        String filePathName = "/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailAddress + ".txt";
+        String filePathName = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes\\" + mailAddress + ".txt";
         try {
+            /* rl.lock();*/
             String fileUser = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectUser = JsonParser.parseString(fileUser).getAsJsonObject();
-
             JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox");
             JsonArray newEmails = new JsonArray();
 
@@ -56,6 +64,8 @@ public class RunnableRequest implements Runnable {
         }
         catch (IOException e){
             System.out.println(e);
+        }finally {
+          /*  rl.unlock();*/
         }
 
         return response;

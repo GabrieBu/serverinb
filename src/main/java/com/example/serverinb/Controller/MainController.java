@@ -15,9 +15,9 @@ public class MainController {
     private ListView<String> listViewLog;
 
     public void initListener(Server server){
+
         if(this.server == null)
             this.server = server;
-
         initListView();
         try{
             ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
