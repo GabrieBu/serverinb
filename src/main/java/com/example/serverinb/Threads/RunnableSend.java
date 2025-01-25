@@ -1,12 +1,14 @@
 package com.example.serverinb.Threads;
 
 import com.example.serverinb.Model.Server;
+import com.example.serverinb.Threads.utils.FileAccessController;
 import com.example.serverinb.Threads.utils.FileManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -15,13 +17,13 @@ public class RunnableSend implements Runnable {
     private final Server server;
     private final String clientReqString;
     private final FileManager fileManager;
-    ReadWriteLock rwl;
+    private final FileAccessController fileAccessController;
 
-    public RunnableSend(String clientReqString, Server server,ReadWriteLock rwl) {
+    public RunnableSend(String clientReqString, Server server,FileAccessController fileAccessController) {
         this.server = server;
         this.clientReqString=clientReqString;
         this.fileManager = new FileManager();
-        this.rwl = rwl;
+        this.fileAccessController = fileAccessController;
     }
 
     public void run() {
@@ -35,7 +37,7 @@ public class RunnableSend implements Runnable {
         for (int i = 0; i < recipients.size(); i++) {
             String emailAddress = recipients.get(i).getAsString();
             if (fileManager.checkEmailInFileNames(emailAddress)) {
-                fileManager.updateFile(emailAddress, mail,rwl); //it will be sent to correct addresses
+                fileManager.updateFile(emailAddress, mail,fileAccessController); //it will be sent to correct addresses
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
                 });

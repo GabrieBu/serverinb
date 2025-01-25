@@ -1,6 +1,7 @@
 package com.example.serverinb.Threads;
 
 import com.example.serverinb.Model.Server;
+import com.example.serverinb.Threads.utils.FileAccessController;
 import com.example.serverinb.Threads.utils.FileManager;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -13,13 +14,13 @@ public class RunnableDelete implements Runnable{
     private final String clientReqString;
     private final Server server;
     private final FileManager fileManager;
-    ReadWriteLock rwl;
+    private final FileAccessController fileAccessController;
 
-    public RunnableDelete(String cientReqString, Server server,ReadWriteLock rwl) {
+    public RunnableDelete(String cientReqString, Server server,FileAccessController fileAccessController) {
         this.clientReqString = cientReqString;
         this.server = server;
         fileManager = new FileManager();
-        this.rwl = rwl;
+        this.fileAccessController = fileAccessController;
     }
 
     public void run() {
@@ -27,7 +28,7 @@ public class RunnableDelete implements Runnable{
         String mailUser = jsonObjectReq.get("user").getAsString();
         int indexToRemove = jsonObjectReq.get("index_to_remove").getAsInt();
         try {
-            fileManager.rewriteFile(mailUser, indexToRemove,rwl);
+            fileManager.rewriteFile(mailUser, indexToRemove,fileAccessController);
         } catch (IOException e) {
             throw new RuntimeException(e); //handle better
         }

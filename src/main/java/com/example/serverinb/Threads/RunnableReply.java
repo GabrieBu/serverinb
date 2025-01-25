@@ -1,6 +1,7 @@
 package com.example.serverinb.Threads;
 
 import com.example.serverinb.Model.Server;
+import com.example.serverinb.Threads.utils.FileAccessController;
 import com.example.serverinb.Threads.utils.FileManager;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,14 +17,14 @@ public class RunnableReply implements Runnable {
     private final Server server;
     private final String typeReqString;
     private final FileManager fileManager;
-    ReadWriteLock rwl;
+    private final FileAccessController fileAccessController;
 
-    public RunnableReply(String clientReqString, Server server, String typeReqString,ReadWriteLock rwl) {
+    public RunnableReply(String clientReqString, Server server, String typeReqString,FileAccessController fileAccessController) {
         this.clientReqString = clientReqString;
         this.server = server;
         this.typeReqString = typeReqString;
         fileManager = new FileManager();
-        this.rwl = rwl;
+        this.fileAccessController = fileAccessController;
     }
 
     public void run() {
@@ -35,7 +36,7 @@ public class RunnableReply implements Runnable {
 
         if(typeReqString.equals("reply")) {
             String toRecipient = allMails.get(0).getAsString();
-            fileManager.updateFile(toRecipient, mail,rwl);
+            fileManager.updateFile(toRecipient, mail,fileAccessController);
             Platform.runLater(() -> {
                 server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
             });
@@ -43,7 +44,7 @@ public class RunnableReply implements Runnable {
         else{ //reply_all
             for (int i = 0; i < allMails.size(); i++) {
                 String toRecipient = allMails.get(i).getAsString();
-                fileManager.updateFile(toRecipient, mail,rwl);
+                fileManager.updateFile(toRecipient, mail,fileAccessController);
                 Platform.runLater(() -> {
                         server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
                 });

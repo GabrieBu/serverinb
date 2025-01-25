@@ -1,5 +1,6 @@
 package com.example.serverinb.Threads;
 
+import com.example.serverinb.Threads.utils.FileAccessController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -15,13 +16,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableRequest implements Runnable {
     private final String clientReqString;
-    ReadWriteLock rwl;
+    private final FileAccessController fileAccessController;
 
-
-    public RunnableRequest(String clientReqString, ReadWriteLock rwl) {
+    public RunnableRequest(String clientReqString, FileAccessController fileAccessController) {
         this.clientReqString=clientReqString;
-        this.rwl=rwl;
-
+        this.fileAccessController = fileAccessController;
     }
 
    public void run(){
@@ -42,11 +41,12 @@ public class RunnableRequest implements Runnable {
    }
 
     private JsonObject generateResponse(String mailAddress, long lastIdSent) {
-       /* Lock rl=rwl.readLock();*/
+
         JsonObject response = new JsonObject();
         String filePathName = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes\\" + mailAddress + ".txt";
+        Lock readLock = fileAccessController.getWriteLock(filePathName);
         try {
-            /* rl.lock();*/
+            readLock.lock();
             String fileUser = Files.readString(Paths.get(filePathName));
             JsonObject jsonObjectUser = JsonParser.parseString(fileUser).getAsJsonObject();
             JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox");
@@ -65,7 +65,7 @@ public class RunnableRequest implements Runnable {
         catch (IOException e){
             System.out.println(e);
         }finally {
-          /*  rl.unlock();*/
+            readLock.unlock();
         }
 
         return response;

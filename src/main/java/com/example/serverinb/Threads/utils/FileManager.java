@@ -39,11 +39,11 @@ public class FileManager implements FileManagerInt {
         return false;
     }
    ///Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/
-    public void updateFile(String emailAddress, JsonObject emailToBeSent, ReadWriteLock rwl){
-        /*Lock wl = rwl.writeLock();*/
+    public void updateFile(String emailAddress, JsonObject emailToBeSent, FileAccessController fileAccessController){
         String filePathName = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes" + emailAddress + ".txt";
+        Lock writeLock = fileAccessController.getWriteLock(filePathName);
         try {
-            /* wl.lock();*/
+            writeLock.lock();
             String fileContent = Files.readString(Paths.get(filePathName));
             JsonObject jsonObject = JsonParser.parseString(fileContent).getAsJsonObject();
 
@@ -55,7 +55,7 @@ public class FileManager implements FileManagerInt {
         } catch (IOException e) {
             throw new RuntimeException("Error reading inbox file: " + e.getMessage());
         }finally{
-          /*  wl.unlock();*/
+          writeLock.unlock();
         }
     }
 
@@ -69,13 +69,14 @@ public class FileManager implements FileManagerInt {
     }
 
     //used only in delete task
-    public void rewriteFile(String mailUser, int indexToRemove,ReadWriteLock rwl) throws IOException {
-       /* Lock wl=rwl.writeLock();*/
+    public void rewriteFile(String mailUser, int indexToRemove,FileAccessController fileAccessController) throws IOException {
+        String filePath = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes" + mailUser + ".txt";
+        Lock writeLock = fileAccessController.getWriteLock(filePath);
         try {
-            String filePath = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes" + mailUser + ".txt";
+            writeLock.lock();
             String fileContent = Files.readString(Paths.get(filePath));
             JsonObject jsonObjectFile = JsonParser.parseString(fileContent).getAsJsonObject();
-            /*  wl.lock();*/
+
             JsonArray inbox = jsonObjectFile.getAsJsonArray("inbox");
             inbox.remove(indexToRemove);
             JsonObject newContentFile = new JsonObject();
@@ -89,7 +90,7 @@ public class FileManager implements FileManagerInt {
         }catch (Exception e){
             throw new RuntimeException("Error removing inbox file: " + e.getMessage());
         }finally {
-            /* wl.unlock();*/
+            writeLock.unlock();
         }
 
 
