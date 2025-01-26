@@ -19,7 +19,7 @@ public class Server{
     }
 
     private void setConfig() throws FileNotFoundException {
-        File configFile = new File("C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\config.txt");
+        File configFile = new File("/Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/config.txt");
         try (Scanner scanner = new Scanner(configFile)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();

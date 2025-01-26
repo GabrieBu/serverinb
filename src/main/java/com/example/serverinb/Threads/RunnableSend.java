@@ -8,10 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableSend implements Runnable {
     private final Server server;

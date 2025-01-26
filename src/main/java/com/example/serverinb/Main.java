@@ -24,6 +24,7 @@ public class Main extends Application {
             server = new Server();
         }
         catch (FileNotFoundException e) {
+            System.out.println("File not found");
             return;
         }
 

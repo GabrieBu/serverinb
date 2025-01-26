@@ -10,7 +10,6 @@ import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableReply implements Runnable {
     private final String clientReqString;

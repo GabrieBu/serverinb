@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class FileManager implements FileManagerInt {
     public  String getFileNameWithoutExtension(String fileName) {
@@ -23,8 +22,7 @@ public class FileManager implements FileManagerInt {
     }
 
     public boolean checkEmailInFileNames(String email) {
-        System.out.println(email);
-        File directory = new File("C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes");
+        File directory = new File("//Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/");
         File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
         if (files == null) {
             return false;
@@ -40,7 +38,7 @@ public class FileManager implements FileManagerInt {
     }
    ///Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/
     public void updateFile(String emailAddress, JsonObject emailToBeSent, FileAccessController fileAccessController){
-        String filePathName = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes" + emailAddress + ".txt";
+        String filePathName = "//Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";
         Lock writeLock = fileAccessController.getWriteLock(filePathName);
         try {
             writeLock.lock();
@@ -70,7 +68,7 @@ public class FileManager implements FileManagerInt {
 
     //used only in delete task
     public void rewriteFile(String mailUser, int indexToRemove,FileAccessController fileAccessController) throws IOException {
-        String filePath = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes" + mailUser + ".txt";
+        String filePath = "//Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailUser + ".txt";
         Lock writeLock = fileAccessController.getWriteLock(filePath);
         try {
             writeLock.lock();
@@ -78,21 +76,21 @@ public class FileManager implements FileManagerInt {
             JsonObject jsonObjectFile = JsonParser.parseString(fileContent).getAsJsonObject();
 
             JsonArray inbox = jsonObjectFile.getAsJsonArray("inbox");
-            inbox.remove(indexToRemove);
-            JsonObject newContentFile = new JsonObject();
-            newContentFile.add("inbox", inbox);
+            if(!inbox.isEmpty()) {
+                inbox.remove(indexToRemove);
+                JsonObject newContentFile = new JsonObject();
+                newContentFile.add("inbox", inbox);
 
-            try (FileWriter writer = new FileWriter(filePath)) {
-                writer.write(newContentFile.toString());
-            } catch (IOException e) {
-                System.err.println("Error writing to file: " + e.getMessage());
+                try (FileWriter writer = new FileWriter(filePath)) {
+                    writer.write(newContentFile.toString());
+                } catch (IOException e) {
+                    System.err.println("Error writing to file: " + e.getMessage());
+                }
             }
         }catch (Exception e){
             throw new RuntimeException("Error removing inbox file: " + e.getMessage());
         }finally {
             writeLock.unlock();
         }
-
-
     }
 }

@@ -1,12 +1,9 @@
 package com.example.serverinb.Threads.utils;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class FileAccessController {
     private final ConcurrentHashMap<String, ReadWriteLock> fileLocks = new ConcurrentHashMap<>();

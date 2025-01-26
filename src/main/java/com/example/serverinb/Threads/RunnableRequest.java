@@ -12,7 +12,6 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableRequest implements Runnable {
     private final String clientReqString;
@@ -41,10 +40,9 @@ public class RunnableRequest implements Runnable {
    }
 
     private JsonObject generateResponse(String mailAddress, long lastIdSent) {
-
         JsonObject response = new JsonObject();
-        String filePathName = "C:\\Users\\andre\\Desktop\\Prog3\\PROGETTO_SERVER\\NEWserver\\serverinb\\src\\main\\java\\com\\example\\serverinb\\Storage\\inboxes\\" + mailAddress + ".txt";
-        Lock readLock = fileAccessController.getWriteLock(filePathName);
+        String filePathName = "//Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + mailAddress + ".txt";
+        Lock readLock = fileAccessController.getReadLock(filePathName);
         try {
             readLock.lock();
             String fileUser = Files.readString(Paths.get(filePathName));
@@ -63,7 +61,7 @@ public class RunnableRequest implements Runnable {
             response.add("inbox", newEmails);
         }
         catch (IOException e){
-            System.out.println(e);
+            System.out.println(e); //handle
         }finally {
             readLock.unlock();
         }

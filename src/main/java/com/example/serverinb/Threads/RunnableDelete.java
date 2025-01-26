@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import javafx.application.Platform;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReadWriteLock;
 
 public class RunnableDelete implements Runnable{
     private final String clientReqString;
