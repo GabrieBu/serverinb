@@ -63,7 +63,7 @@ public class Dispatcher implements Runnable{
             }
         }
         catch (Exception e) {
-            System.out.println("Error: Switch dispatcher " + e.getMessage()); //handle better
+            throw new RuntimeException("Error on Switch dispatcher " + e.getMessage());
         }
         finally {
             executor.shutdown();

@@ -29,7 +29,7 @@ public class RunnableDelete implements Runnable{
         try {
             fileManager.rewriteFile(mailUser, indexToRemove,fileAccessController);
         } catch (IOException e) {
-            throw new RuntimeException(e); //handle better
+            throw new RuntimeException("Error rewrite file on remove: " + e.getMessage());
         }
         Platform.runLater(() -> {
             server.getLogMessages().add("Email deleted from server correctly [" + mailUser + "]");

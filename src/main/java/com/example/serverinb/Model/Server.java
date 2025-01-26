@@ -43,6 +43,8 @@ public class Server{
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Error loading config file " + key + ": " + value);
+                        throw new RuntimeException("Error reading config file: " + e.getMessage());
+
                     }
                 }
             }

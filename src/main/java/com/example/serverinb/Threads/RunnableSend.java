@@ -62,6 +62,7 @@ public class RunnableSend implements Runnable {
             toClient.getOutputStream().write(response.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("Error confirmation on SEND: " + e.getMessage());
         }
     }
 }

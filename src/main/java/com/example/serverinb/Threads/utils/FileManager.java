@@ -36,7 +36,7 @@ public class FileManager implements FileManagerInt {
         }
         return false;
     }
-   ///Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/
+
     public void updateFile(String emailAddress, JsonObject emailToBeSent, FileAccessController fileAccessController){
         String filePathName = "//Users/gabrielebuoso/IdeaProjects/serverinb/serverinb/src/main/java/com/example/serverinb/Storage/inboxes/" + emailAddress + ".txt";
         Lock writeLock = fileAccessController.getWriteLock(filePathName);

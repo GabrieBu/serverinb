@@ -57,6 +57,8 @@ public class RunnableReply implements Runnable {
             toClient.getOutputStream().write(response.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("Error sending client feedback: " + e.getMessage());
+
         }
     }
 }

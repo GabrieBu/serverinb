@@ -41,7 +41,7 @@ public class RunnableAuth implements Runnable{
             writer.println(response);
         }
         catch( IOException e){
-            System.out.println("Error reading inbox file: " + e.getMessage());
+            throw new RuntimeException("Error reading inbox file: " + e.getMessage());
         }
     }
 }

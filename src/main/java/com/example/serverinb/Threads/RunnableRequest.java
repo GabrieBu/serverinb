@@ -34,8 +34,7 @@ public class RunnableRequest implements Runnable {
            writer.flush();
        }
        catch (IOException e){
-           //qualcosa di più solido
-           System.out.println(e);
+           throw new RuntimeException("Error getting localhost port: " + e.getMessage());
        }
    }
 
@@ -61,7 +60,7 @@ public class RunnableRequest implements Runnable {
             response.add("inbox", newEmails);
         }
         catch (IOException e){
-            System.out.println(e); //handle
+            throw new RuntimeException("Error genereting response for client: " + e.getMessage());
         }finally {
             readLock.unlock();
         }
