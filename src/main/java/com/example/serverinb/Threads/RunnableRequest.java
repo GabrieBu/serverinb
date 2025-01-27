@@ -49,7 +49,7 @@ public class RunnableRequest implements Runnable {
             JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox"); //convert inbox array into JsonArray
 
             JsonArray newEmails = new JsonArray(); //inbox changes (to append to response Json)
-            for (int i = inboxArray.size() - 1; i >= 0; i--) {
+            for (int i = 0 ; i < inboxArray.size(); i++) {
                 JsonObject mail = inboxArray.get(i).getAsJsonObject();
                 long mailId = mail.get("id").getAsLong();
 
