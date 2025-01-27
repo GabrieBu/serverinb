@@ -14,8 +14,7 @@ import java.util.concurrent.Executors;
 
 public class Dispatcher implements Runnable{
     private final Server server;
-    private final FileAccessController fileAccessController; // Gestisce i ReadWriteLock
-
+    private final FileAccessController fileAccessController; // gestisce l'accesso al file con semafori Reader-Writer
 
     public Dispatcher(Server server) {
         this.server = server;
@@ -27,8 +26,8 @@ public class Dispatcher implements Runnable{
         ExecutorService executor = Executors.newFixedThreadPool(server.getPoolSize());
         try {
             ServerSocket serverSocket = new ServerSocket(this.server.getServerPort());
+            System.out.println("Listening on port " + server.getServerPort());
             while(true) {
-                System.out.println("Listening on port " + server.getServerPort());
                 Socket sock = serverSocket.accept();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 String clientReqString = reader.readLine();
@@ -63,7 +62,7 @@ public class Dispatcher implements Runnable{
             }
         }
         catch (Exception e) {
-            throw new RuntimeException("Error on Switch dispatcher " + e.getMessage());
+            throw new RuntimeException("Error on dispatcher " + e.getMessage());
         }
         finally {
             executor.shutdown();

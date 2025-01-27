@@ -35,7 +35,7 @@ public class RunnableSend implements Runnable {
         for (int i = 0; i < recipients.size(); i++) {
             String emailAddress = recipients.get(i).getAsString();
             if (fileManager.checkEmailInFileNames(emailAddress)) {
-                fileManager.updateFile(emailAddress, mail,fileAccessController); //it will be sent to correct addresses
+                fileManager.updateFile(emailAddress, mail, fileAccessController); //it will be sent to correct addresses
                 Platform.runLater(() -> {
                     server.getLogMessages().add("Mail from [ " + from + "] sent to " + emailAddress);
                 });
@@ -61,8 +61,7 @@ public class RunnableSend implements Runnable {
         try(Socket toClient = new Socket("localhost", clientPort)) {
             toClient.getOutputStream().write(response.toString().getBytes());
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error confirmation on SEND: " + e.getMessage());
+            throw new RuntimeException("Error sending back feedback to the client: " + e.getMessage());
         }
     }
 }

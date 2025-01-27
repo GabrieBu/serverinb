@@ -41,10 +41,9 @@ public class Server{
                             default:
                                 System.out.println("Unrecognized key: " + key);
                         }
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException e) { //safe cast
                         System.out.println("Error loading config file " + key + ": " + value);
                         throw new RuntimeException("Error reading config file: " + e.getMessage());
-
                     }
                 }
             }

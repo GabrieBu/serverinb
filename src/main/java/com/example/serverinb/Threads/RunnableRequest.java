@@ -18,19 +18,19 @@ public class RunnableRequest implements Runnable {
     private final FileAccessController fileAccessController;
 
     public RunnableRequest(String clientReqString, FileAccessController fileAccessController) {
-        this.clientReqString=clientReqString;
+        this.clientReqString = clientReqString;
         this.fileAccessController = fileAccessController;
     }
 
    public void run(){
        JsonObject jsonObjectReq = JsonParser.parseString(clientReqString).getAsJsonObject();
-        try (Socket socket = new Socket("localhost", jsonObjectReq.get("port").getAsInt())){
 
+        try (Socket socket = new Socket("localhost", jsonObjectReq.get("port").getAsInt())){
             String mailAddress = jsonObjectReq.get("user").getAsString();
             long lastIdSent = jsonObjectReq.get("last_id_received").getAsLong();
            OutputStream outputStream = socket.getOutputStream();
            PrintWriter writer = new PrintWriter(outputStream, true); // Auto-flushing enabled
-           writer.println(generateResponse(mailAddress, lastIdSent));
+           writer.println(generateResponse(mailAddress, lastIdSent)); //send inbox's changes to the client (first time all mails)
            writer.flush();
        }
        catch (IOException e){
@@ -44,11 +44,11 @@ public class RunnableRequest implements Runnable {
         Lock readLock = fileAccessController.getReadLock(filePathName);
         try {
             readLock.lock();
-            String fileUser = Files.readString(Paths.get(filePathName));
-            JsonObject jsonObjectUser = JsonParser.parseString(fileUser).getAsJsonObject();
-            JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox");
-            JsonArray newEmails = new JsonArray();
+            String fileUser = Files.readString(Paths.get(filePathName)); //reads the file
+            JsonObject jsonObjectUser = JsonParser.parseString(fileUser).getAsJsonObject(); //cast ot JsonObject
+            JsonArray inboxArray = jsonObjectUser.getAsJsonArray("inbox"); //convert inbox array into JsonArray
 
+            JsonArray newEmails = new JsonArray(); //inbox changes (to append to response Json)
             for (int i = inboxArray.size() - 1; i >= 0; i--) {
                 JsonObject mail = inboxArray.get(i).getAsJsonObject();
                 long mailId = mail.get("id").getAsLong();
@@ -60,7 +60,7 @@ public class RunnableRequest implements Runnable {
             response.add("inbox", newEmails);
         }
         catch (IOException e){
-            throw new RuntimeException("Error genereting response for client: " + e.getMessage());
+            throw new RuntimeException("Error generating response for the client: " + e.getMessage());
         }finally {
             readLock.unlock();
         }

@@ -27,12 +27,12 @@ public class RunnableDelete implements Runnable{
         String mailUser = jsonObjectReq.get("user").getAsString();
         int indexToRemove = jsonObjectReq.get("index_to_remove").getAsInt();
         try {
-            fileManager.rewriteFile(mailUser, indexToRemove,fileAccessController);
+            fileManager.rewriteFile(mailUser, indexToRemove, fileAccessController);
+            Platform.runLater(() -> {
+                server.getLogMessages().add("Email deleted from server correctly [" + mailUser + "]");
+            });
         } catch (IOException e) {
             throw new RuntimeException("Error rewrite file on remove: " + e.getMessage());
         }
-        Platform.runLater(() -> {
-            server.getLogMessages().add("Email deleted from server correctly [" + mailUser + "]");
-        });
     }
 }

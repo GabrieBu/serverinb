@@ -16,6 +16,8 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main_view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 768, 462);
         stage.setTitle("Server Log");
+        MainController contr = fxmlLoader.getController();
+        stage.setOnCloseRequest(MainController::shutdown); //equivalent to: event -> MainController.shutdown(event)
         stage.setScene(scene);
         stage.show();
 
@@ -28,7 +30,7 @@ public class Main extends Application {
             return;
         }
 
-        MainController contr = fxmlLoader.getController();
+
         contr.initListener(server);
     }
 

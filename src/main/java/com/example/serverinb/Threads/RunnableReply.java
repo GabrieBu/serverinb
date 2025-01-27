@@ -21,7 +21,7 @@ public class RunnableReply implements Runnable {
     public RunnableReply(String clientReqString, Server server, String typeReqString,FileAccessController fileAccessController) {
         this.clientReqString = clientReqString;
         this.server = server;
-        this.typeReqString = typeReqString;
+        this.typeReqString = typeReqString; //useful for either reply or reply_all
         fileManager = new FileManager();
         this.fileAccessController = fileAccessController;
     }
@@ -34,7 +34,7 @@ public class RunnableReply implements Runnable {
         int clientPort = jsonObjectReq.get("port").getAsInt();
 
         if(typeReqString.equals("reply")) {
-            String toRecipient = allMails.get(0).getAsString();
+            String toRecipient = allMails.get(0).getAsString(); //old "from" user
             fileManager.updateFile(toRecipient, mail,fileAccessController);
             Platform.runLater(() -> {
                 server.getLogMessages().add("[ " + from + "] replied to [" + toRecipient + "]");
@@ -49,16 +49,13 @@ public class RunnableReply implements Runnable {
                 });
             }
         }
-
         //feedback to the client (it can be only positive)
         JsonObject response = new JsonObject();
         response.addProperty("type", "send_ok");
         try(Socket toClient = new Socket("localhost", clientPort)) {
             toClient.getOutputStream().write(response.toString().getBytes());
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("Error sending client feedback: " + e.getMessage());
-
         }
     }
 }
